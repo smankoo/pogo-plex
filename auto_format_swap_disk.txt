@@ -1,0 +1,72 @@
+#!/bin/bash
+# Get devices with free space greater than 1.5 GB and total size less than 65 GB
+for MP in `df | grep "/media" | awk '($4 > 1572864 && $2 < 68157440) {print $2" "$6}' | sort -n | awk '{print $2}'`; do
+	FILE_COUNT=`ls -1 ${MP} | egrep -v -w "(lost\+found|swap|clone)" | wc -l`
+	echo MP $MP FILE_COUNT $FILE_COUNT
+	if [ $FILE_COUNT -eq 0 ] ; then
+		if [ -d ${MP}/swap ] && [ `ls -1 ${MP}/swap | grep -v "lost+found" | wc -l` -eq 0 ] ; then
+			echo "Going to make this drive my bitch - ${MP}" | tee ${MP}/will_swap.txt
+			DEVICE=`df | grep -w ${MP} | awk '{print $1}'| sed 's/[0-9]$//g'`
+			echo "This device is going to be our slave - $DEVICE"
+			
+			umount ${DEVICE}*
+			dd if=/dev/zero of=${DEVICE} bs=512 count=20 conv=notrunc
+			echo -e "o\nn\np\n1\n\n+1G\nn\np\n\n\n\nw\n"|fdisk ${DEVICE}
+
+			mkswap -L pogo_swap ${DEVICE}1 && swapon ${DEVICE}1
+			mkfs.ext4 -F -L pogo_usb ${DEVICE}2 || exit
+
+			if [ ! -d /media/pogo_usb ]; then
+				mkdir /media/pogo_usb
+			fi
+			mount ${DEVICE}2 /media/pogo_usb
+		elif [ -d ${MP}/clone ]; then
+			# TODO: Code for cloning rootfs
+			null
+		fi
+	fi
+done
+
+
+umount /dev/sdb1;echo "w"|  fdisk /dev/sdb && echo -e "o\nn\np\n\n\n\nw\n"|  fdisk /dev/sdb || partprobe && echo -e "o\nn\np\n\n\n\nw\n"|  fdisk /dev/sdb && mke2fs -j /dev/sdb1 && mount /dev/sdb1 /media/pogo_clone && cp /media/sf_D_DRIVE/pogo_rootfs.tar.gz /media/pogo_clone && cd /media/sf_D_DRIVE && tar -zxvf pogo_rootfs.tar.gz
+
+
+tar -zcvf pogo_os.v1.tar.gz /media/sumeet/605a9853-1453-4c2c-bbf2-285f0917db71
+
+
+#!/bin/bash
+
+umount /dev/sdb* 2>/dev/null
+dd if=/dev/zero of=/dev/sdb bs=512 count=20 conv=notrunc
+echo -e "o\nn\np\n1\n\n+1G\nn\np\n\n\n\nw\n"|fdisk /dev/sdb
+
+mkswap -L pogo_swap /dev/sdb1 && swapon /dev/sdb1
+mkfs.ext4 -F -L pogo_usb /dev/sdb2 
+|| exit
+
+if [ ! -d /media/pogo_usb ]; then
+	mkdir /media/pogo_usb
+fi
+mount /dev/sdb2 /media/pogo_usb
+
+
+umount /dev/sdb1
+echo "o
+n
+p
+1
+
+
+w
+"|fdisk /dev/sdb
+mkfs.ext4 /dev/sdb1
+if [ ! -d /media/raw_usb ]; then
+	mkdir /media/raw_usb
+fi
+mount /dev/sdb1 /media/raw_usb
+
+
+
+parted -s /dev/sdb print|awk '/^Disk/ {print $3}'|sed 's/[Mm][Bb]//'
+
+

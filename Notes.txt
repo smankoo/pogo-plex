@@ -1,0 +1,74 @@
+dd if=/dev/zero of=/media/hd1/system/swapfile.img bs=1M count=1024
+
+/etc/udev/rules.d/100-mount-videos.rules
+ACTION=="add", ATTRS{idVendor}=="0a81", ATTRS{idProduct}=="0101", RUN+="/home/your_username/bin/mount_videos.sh"
+
+
+/etc/udev/rules.d/100-mount-usb.rules
+ACTION=="add", ATTRS{idVendor}=="1058", ATTRS{idProduct}=="0820", RUN+="/root/tst.sh"
+
+
+date > /tmp/usb_connected.txt
+echo "USB drive connected" >> /tmp/usb_connected.txt
+
+ACTION=="add", SUBSYSTEM=="usb", RUN+="/tmp/tst.sh"
+
+1058:0820
+
+udevadm control --reload-rules
+
+/media/mankoos_hd1/system
+
+# swapload script
+/usr/local/sbin/rc.local
+
+# swapload service
+/etc/systemd/system/rc-local.service
+
+systemctl enable rc-local
+systemctl status rc-local
+systemctl disable rc-local
+
+## IMPORTANT
+Name the hard drive(s) like this - pogo_hd1, pogo_hd2
+Name the thumb drive(s) like this - pogo_usb1, pogo_usb2
+-- This is to enable swap usage.
+-- Attach a usb stick with first partition as swap.
+-- The order of preference is /dev/sdx1 > pogo_usb1 > pogo_usb2 > pogo_hd1 > pogo_hd2
+
+
+##### Prepare USB for swap
+
+umount /media/pogo_hd1/system
+fdisk /dev/sdx
+mkswap -L pogo_swap /dev/sdx1
+mkfs.ext4 -L pogo_usb /dev/sdx2
+
+## Log Rotation
+# add the following to /etc/logrotate.conf
+/var/log/swapload.log {
+         missingok
+		 size 10k
+         copytruncate
+         rotate 4
+}
+
+
+00 02 * * *  /usr/bin/logrotate -s /var/log/logstatus /etc/logrotate.conf
+
+
+
+### LAMP Installation
+
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-arch-linux
+# after php installation, httpd will fail to start, then make the following modifications to httpd.conf
+
+/etc/httpd/conf/httpd.conf:
+
+LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
+#LoadModule mpm_event_module modules/mod_mpm_event.so
+
+# while configuring mysql
+
+use owncloud;
+GRANT ALL PRIVILEGES ON owncloud.* TO 'owncloud'@'localhost' WITH GRANT OPTION;
