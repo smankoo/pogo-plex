@@ -82,3 +82,5 @@ Pending
 - Find a way to report IP (install twitter client or googlecl)
 - Install wakeonlan (wol)
 - Set up transcoding mechanism
+
+Testing github proxy setting
