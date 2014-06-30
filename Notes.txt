@@ -72,3 +72,13 @@ LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
 
 use owncloud;
 GRANT ALL PRIVILEGES ON owncloud.* TO 'owncloud'@'localhost' WITH GRANT OPTION;
+
+########################
+Pending 
+########################
+
+- Install and check handbrake performance
+- Find a way to backup rootfs
+- Find a way to report IP (install twitter client or googlecl)
+- Install wakeonlan (wol)
+- Set up transcoding mechanism
