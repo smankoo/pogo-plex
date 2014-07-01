@@ -52,10 +52,23 @@ mkfs.ext4 -L pogo_usb /dev/sdx2
          copytruncate
          rotate 4
 }
+/var/log/crontab_backup.txt {
+         missingok
+		 size 10k
+         copytruncate
+         rotate 10
+}
+/var/log/upload_ip.log {
+         missingok
+		 size 10k
+         copytruncate
+         rotate 4
+}
 
 
 00 02 * * *  /usr/bin/logrotate -s /var/log/logstatus /etc/logrotate.conf
-
+05 02 * * *  { /bin/echo "## crontab backed up at : `date`" && /usr/bin/crontab -l ; } > /var/log/crontab_backup.txt
+00,05,10,15,20,25,30,35,40,45,50,55 * * * * /root/scripts/upload_ip.sh >> /var/log/upload_ip.log 2>&1
 
 
 ### LAMP Installation
