@@ -1,0 +1,17 @@
+Transcoding Mechanism
+=====================
+All downloaded videos must be transferred to transcode-out directory
+
+At Pogo-Plex
+1. Look for transcoding-host (w.o.l. if required)
+2. *when transcoding-host found* - transfer videos to transcoding-host (scp/ftp)
+
+At Transcoding-Host
+1. Monitor transcode-pending directory. 
+2. *when file(s) received - Transcode video - output to transcode-interim directory
+3. *after transcode is complete* - move the file from transcode-interim dir to transcode-done
+
+At Pogo-Plex
+1. Monitor transcode-done directory on transcoding-host
+2. *when file found* - copy to transcode-in dir
+3. Transfer contents of transcode-in dir to Movies dir

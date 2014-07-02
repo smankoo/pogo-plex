@@ -48,27 +48,47 @@ mkfs.ext4 -L pogo_usb /dev/sdx2
 # add the following to /etc/logrotate.conf
 /var/log/swapload.log {
          missingok
-		 size 10k
+         size 10k
          copytruncate
          rotate 4
 }
 /var/log/crontab_backup.txt {
          missingok
-		 size 10k
+         size 10k
          copytruncate
          rotate 10
 }
 /var/log/upload_ip.log {
          missingok
-		 size 10k
+         size 10k
+         copytruncate
+         rotate 4
+}
+/var/log/rootfs_backup.log {
+         missingok
+         size 1000k
+         copytruncate
+         rotate 4
+}
+/var/log/pogo-plex.log {
+         missingok
+         size 10k
          copytruncate
          rotate 4
 }
 
+## Cron setup
+# Install fcron
+pacman -Sy fcron
+cd /usr/bin && ln -s fcrontab crontab
 
 00 02 * * *  /usr/bin/logrotate -s /var/log/logstatus /etc/logrotate.conf
-05 02 * * *  { /bin/echo "## crontab backed up at : `date`" && /usr/bin/crontab -l ; } > /var/log/crontab_backup.txt
-00,05,10,15,20,25,30,35,40,45,50,55 * * * * /root/scripts/upload_ip.sh >> /var/log/upload_ip.log 2>&1
+05 02 * * *  { /bin/echo "## crontab backed up at : `date`" && /usr/bin/crontab -l ; } >> /var/log/crontab_backup.txt
+00,15,23,30,45 * * * * /root/scripts/upload_ip.sh >> /var/log/upload_ip.log 2>&1
+00 02 * * * /root/scripts/rootfs_backup.sh >> /var/log/rootfs_backup.log 2>&1
+00,10,20,30,40,50 * * * * /root/scripts/monitor_yandex_torrents.sh
+
+#00,05,10,15,20,25,30,35,40,45,50,55 * * * * /root/scripts/upload_ip.sh >> /var/log/upload_ip.log 2>&1
 
 
 ### LAMP Installation
@@ -86,14 +106,23 @@ LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
 use owncloud;
 GRANT ALL PRIVILEGES ON owncloud.* TO 'owncloud'@'localhost' WITH GRANT OPTION;
 
+
+### Yandex Integration
+
+# install davfs2
+pacman -Sy davfs2
+mkdir /media/yandex
+echo "https://webdav.yandex.ru sumeet.mankoo@yandex.ru Sm123456" >> /etc/davfs2/secrets
+echo "https://webdav.yandex.ru /media/yandex davfs user,noauto,uid=root,file_mode=600,dir_mode=700 0 1" >> /etc/fstab
+
+
+## Install git to get couchpotato working properly
+pacman -Sy git
+
 ########################
 Pending 
 ########################
 
-- Install and check handbrake performance
-- Find a way to backup rootfs
-- Find a way to report IP (install twitter client or googlecl)
-- Install wakeonlan (wol)
 - Set up transcoding mechanism
 
-Testing github proxy setting
+

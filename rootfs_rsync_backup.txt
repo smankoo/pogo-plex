@@ -1,7 +1,5 @@
-rsync -av --delete-excluded --exclude-from=backup.lst / <backup_destination>
 
-
-## backup.lst
+## /root/scripts/backup.lst
 # Include
 + /dev/console
 + /dev/initctl
@@ -17,3 +15,23 @@ rsync -av --delete-excluded --exclude-from=backup.lst / <backup_destination>
 - lost+found/
 - /media/*
 - /mnt/*
+
+
+rsync -av --delete-excluded --exclude-from=backup.lst root@192.168.1.120:/ pogo_os
+
+/etc/davfs2/secrets
+
+https://webdav.example.com /home/username/webdav davfs user,noauto,uid=username,file_mode=600,dir_mode=700 0 1
+
+Create secrets file in your home:
+
+
+mkdir ~/.davfs2/
+echo "https://webdav.yandex.ru sumeet.mankoo@yandex.ru Sm123456" >> ~/.davfs2/secrets 
+chmod 0600 ~/.davfs2/secrets
+
+mount -t davfs https://webdav.yandex.ru /media/yandex
+
+https://webdav.yandex.ru /media/yandex davfs user,noauto,uid=root,file_mode=600,dir_mode=700 0 1
+
+* * * * * /bin/date > /tmp/fcrontest.txt 2>&1
