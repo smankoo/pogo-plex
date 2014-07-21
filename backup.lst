@@ -1,0 +1,16 @@
+## backup.lst
+# Include
++ /dev/console
++ /dev/initctl
++ /dev/null
++ /dev/zero
+
+# Exclude
+- /dev/*
+- /run/*
+- /proc/*
+- /sys/*
+- /tmp/*
+- lost+found/
+- /media/*
+- /mnt/*

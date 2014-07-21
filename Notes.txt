@@ -87,6 +87,8 @@ cd /usr/bin && ln -s fcrontab crontab
 00,15,23,30,45 * * * * /root/scripts/upload_ip.sh >> /var/log/upload_ip.log 2>&1
 00 02 * * * /root/scripts/rootfs_backup.sh >> /var/log/rootfs_backup.log 2>&1
 00,10,20,30,40,50 * * * * /root/scripts/monitor_yandex_torrents.sh
+*/12 * * * * /root/scripts/delete_sample.sh
+*/30 * * * * /bin/date >> /tmp/crontest.log 2>&1
 
 #00,05,10,15,20,25,30,35,40,45,50,55 * * * * /root/scripts/upload_ip.sh >> /var/log/upload_ip.log 2>&1
 

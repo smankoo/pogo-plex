@@ -19,6 +19,7 @@ else
 	fi
 fi
 
-/usr/bin/google docs delete --title "pogo-plex-ip.txt" --yes
-/usr/bin/google docs upload /root/scripts/ip.txt --title "pogo-plex-ip.txt"
+#/usr/bin/google docs delete --title "pogo-plex-ip.txt" --yes
+#/usr/bin/google docs upload /root/scripts/ip.txt --title "pogo-plex-ip.txt"
+
 

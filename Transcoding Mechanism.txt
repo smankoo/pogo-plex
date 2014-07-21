@@ -3,13 +3,19 @@ Transcoding Mechanism
 All downloaded videos must be transferred to transcode-out directory
 
 At Pogo-Plex
-1. Look for transcoding-host (w.o.l. if required)
-2. *when transcoding-host found* - transfer videos to transcoding-host (scp/ftp)
+0. [Continuous Loop] Monitor transcode-out dir, when files found -
+	1. Look for transcoding-host (w.o.l. if required) [Loop until done]
+	2. *when transcoding-host found* - transfer contents of transcode-out to transcoding-host (scp/ftp)
 
 At Transcoding-Host
-1. Monitor transcode-pending directory. 
-2. *when file(s) received - Transcode video - output to transcode-interim directory
-3. *after transcode is complete* - move the file from transcode-interim dir to transcode-done
+1. Monitor transcode-pending directory. *when file(s) received - Move file to transcode-queue dir [Continuous loop every - 2 mins]
+2. Transcode videos in transcode-queue dir - output to transcode-interim directory
+3. Move the videos from transcode-interim dir to transcode-done - If successful, delete the contents of transcode-queue dir
+4. Monitor transcode-done dir [Continuous Loop every - 5 mins]
+5. 		*If files found* - 
+			- Check if any scp/ftp process is running.
+				- If not, copy the contents of transcode-done dir to pogo-plex (scp/ftp) [Loop until done] 
+7. Delete the contents of transcode-done dir 
 
 At Pogo-Plex
 1. Monitor transcode-done directory on transcoding-host
